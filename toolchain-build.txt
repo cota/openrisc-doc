@@ -1,0 +1,56 @@
+
+
+Binutils
+--------
+
+mkdir binutils-build
+cd binutils-build
+../binutils-2.20.1/configure --target=or32-linux '--prefix=/home/jonas/opencores/toolchain-or32-linux'
+
+Stage 1 GCC
+-----------
+
+mkdir gcc-build
+cd gcc-build
+../gcc-4.5.1/configure --target=or32-linux '--prefix=/home/jonas/opencores/toolchain-or32-linux' '--disable-libssp' '--srcdir=../gcc-4.5.1' '--enable-languages=c' --without-headers --enable-threads=single --disable-libgomp --disable-libmudflap
+
+Install Linux Headers
+---------------------
+
+make INSTALL_HDR_PATH=/home/jonas/opencores/toolchain-or32-linux/or32-linux headers_install
+
+
+Compile uClibc
+--------------
+
+remember to setup devel_prefix, cross_compile_prefix, linux header location
+
+and install
+
+important here is that libc.a gets installed to {prefix}/or32-linux/lib/
+
+
+Stage 2 GCC
+-----------
+
+mkdir gcc-build-2
+cd gcc-build-2
+../gcc-4.5.1/configure --target=or32-linux '--prefix=/home/jonas/opencores/toolchain-or32-linux' '--disable-libssp' '--srcdir=../gcc-4.5.1' '--enable-languages=c' --enable-threads=posix --disable-libgomp --disable-libmudflap
+
+If you want C++, try this instead... important to be explicit about --disable-shared here because libstdc++-v3 isn't clever enough to figure it out for itself.
+
+../gcc-4.5.1/configure --target=or32-linux '--prefix=/home/jonas/opencores/toolchain-or32-linux' '--disable-libssp' '--srcdir=../gcc-4.5.1' '--enable-languages=c++' --enable-threads=posix --disable-libgomp --disable-libmudflap --disable-shared
+
+And rebuild uClibc
+------------------
+
+Busybox
+-------
+
+remember to set cross-compiler prefix
+
+Build Linux
+-----------
+
+don't forget to set cross-compiler prefix to or32-linux
+
