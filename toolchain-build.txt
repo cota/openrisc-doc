@@ -1,24 +1,84 @@
 Building the OpenRISC Toolchain
 ===============================
+:toc:
 
-The commands below make use of an environment variable, PREFIX, which specifies
-the installation directory for the toolchain.  If you export this variable into
-your environment, then you can make use of the commands below verbatim; 
-otherwise, you need to replace the occurences of $PREFIX below with the
-installation path.
+The instructions below reference the source code repository which is
+browseable at http://git.openrisc.net
+
+Building the Easy Way!
+----------------------
+
+The easy way to build a toolchain is to use the "toolchain superproject" will
+allow you to easily check out suitable points of the necessary sub-components
+for building a working toolchain.
+
+Begin by checking out the superproject, as follows:
+
+----
+$ git clone git://openrisc.net/jonas/toolchain
+----
+
+Once that's done, you've got everything you need.  The git submodule command,
+below, will clone the repositories of the toolchain components and check out
+suitable commits.
+
+When building the toolchain, specify the installation location by passing
+the PREFIX variable on the make command line.
+
+NOTE: Make use of your multiple CPU cores by passing a suitably large number
+to the -j parameter in order to parallelize your build.  A good rule of thumb
+here is to use a value which is twice your number of cores plus 1; e.g. for a
+quad core (four cores) machine, use 2*4+1 = 9.
+
+----
+$ cd toolchain
+$ git submodule update --init
+$ make -j3 PREFIX=<absolute install path>
+----
+
+PREFIX determines where the toolchain will be installed.
+
+A good value for PREFIX might be:
+
+ make PREFIX=~/openrisc/toolchain
+
+After that's all done, you'll want to put the toolchain install path into
+your environment's PATH so that the newly installed tools can be found:
+
+ export PATH=<PREFIX>/bin;$PATH
+
+where PREFIX is the same value as you used when building the toolchain.
+
+
+Building by Hand!
+-----------------
+
+If you really want to understand how the toolchain is built, the following
+sections will guide you step-by-step through the process of building all
+the bits and pieces that comprise the toolchain.
 
 These build instructions make use of a few environment variables.  The
 easiest way to follow these build instructions is to export these variables
-into your environment, as follows:
+into your environment, as follows.  If you do so, you should be able to
+use the commands in this document verbatim for building your toolchain.
 
 ----
-export PREFIX=/opt/or1k-toolchain
+export PREFIX=~/openrisc/toolchain
 export TARGET=or32-linux
 export SYSROOT=$PREFIX/$TARGET/sys-root
 ----
 
 If you decide not to make use of these environment variables, you will have
 to adjust the commands in the rest of this document accordingly.
+
+The meanings of these variables are:
+
+- PREFIX: toolchain installation location
+- TARGET: must be or32-linux
+- SYSROOT: where the or32-linux system root will be location; the value
+$PREFIX/$TARGET/sys-root is the default, but you can put it elsewhere if
+you want
+
 
 Binutils
 --------
@@ -73,38 +133,30 @@ The next step is build our target C library.  Building libC requires that Linux
 headers be installed.  For that we'll need to check out the kernel:
 
 ----
-$ git clone ...
+$ git clone git://openrisc.net/jonas/linux
 ----
 
 ...and install the headers into the target sysroot.
 
 ---- 
-$ make INSTALL_HDR_PATH=$PREFIX/$TARGET/sys-root/usr headers_install
 $ make INSTALL_HDR_PATH=${SYSROOT}/usr headers_install
 ----
 
 Compile uClibc
 --------------
 
-IMPORTANT:  uClibc respects the value of the $PREFIX environment variable,
-so if you exported this variable above then the default configuration is
-all you need.
-
-NOTE: xyz
+IMPORTANT:  Don't be confused by uClibc's Makefile variable PREFIX.  This
+variable is analogous to Automake's DESTDIR, and not to Automake's --prefix.
+It's also not the same as the environment variable PREFIX that you defined
+earlier.
 
 The default configuration for uClibc makes use of the environment variables
-PREFIX and TARGET.  If you did not export these into your environment
-earlier, then you will need to adjust the uClibc configuration accordingly.
-
-remember to setup devel_prefix, cross_compile_prefix, linux header location
-
-and install
-
-important here is that libc.a gets installed to {prefix}/or32-linux/lib/
-
-m
+SYSROOT for finding the installed kernel headers.  Assuming that you exported
+this variable into your environment then the default configuration should
+be all you need.
 
 ----
+make ARCH=or32 defconfig
 make PREFIX=${SYSROOT}
 make PREFIX=${SYSROOT} install
 ----
@@ -122,35 +174,39 @@ Now that we have a libC for our target, it's time to build the compiler.  This
  $ ../gcc-svn/configure --target=or32-linux --prefix=$PREFIX   \
 --disable-libssp --srcdir=../gcc-svn --enable-languages=c      \
 --enable-threads=posix --disable-libgomp --disable-libmudflap  \
---with-sysroot
+--with-sysroot=${SYSROOT}
  $ make
  $ make install
 ----
 
-If you want C++, try this instead... important to be explicit about --disable-shared here because libstdc++-v3 isn't clever enough to figure it out for itself.
+If you want C\+\+, try this instead... important to be explicit about --disable-shared here because libstdc++-v3 isn't clever enough to figure it out for itself.
 
 ----
  $ ../gcc-svn/configure --target=or32-linux --prefix=<prefix>   \
 --disable-libssp --srcdir=../gcc-svn --enable-languages=c,c++   \
 --enable-threads=posix --disable-libgomp --disable-libmudflap   \
---disable-shared --with-sysroot
+--disable-shared --with-sysroot=${SYSROOT}
 ----
 
 And rebuild uClibc
 ------------------
 
-Now that the final GCC build is complete, uClibc can be built with the final compiler.  This is simple a matter of doing a clean rebuild...
+Now that the final GCC build is complete, uClibc can be built with the final
+compiler.  This is simple a matter of doing a clean rebuild...
 
 ----
 $ make clean
-$ make; make install
+$ make PREFIX=${SYSROOT} install
 ----
 
-Busybox
+BusyBox
 -------
 
+BusyBox is technically not part of the toolchain, but the below instructions
+are illustrative of how your new toolchain should be used.
+
 ----
-$ git clone ...
+$ git clone git://busybox.net/busybox.git
 ----
 
 Configure BusyBox using menuconfig:
@@ -167,25 +223,13 @@ and where to install.
  CONFIG_PREFIX: where to install
 
 When using a non-default sysroot, we need to make sure that the compiler
-can find the necessary header files and libraries; that's where the
-CONFIG_EXTRA_CFLAGS come in.
+can find the necessary header files and libraries; this is most easily
+done by exporting the CFLAGS variable into your environment:
+
+ export CFLAGS="--sysroot=$SYSROOT"
 
 Then build BusyBox, specifying the CROSS_COMPILE prefix and the CONFIG_PREFIX
 for the intallation directory.
-
-
-
-----
-$ make CROSS_COMPILE=or32-linux-
-$ make CROSS_COMPILE=or32-linux- CONFIG_PREFIX=$SYSROOT install
-----
-
-----
-$ make CONFIG_EXTRA_CFLAGS="--sysroot=$SYSROOT" CROSS_COMPILE=or32-linux- \
-CONFIG_PREFIX=$SYSROOT install
-----
-
-Actually, the best thing is to export CFLAGS:
 
 ----
 $ export CFLAGS="--sysroot=$SYSROOT"
@@ -193,19 +237,20 @@ $ make CROSS_COMPILE=or32-linux- CONFIG_PREFIX=$SYSROOT install
 ----
 
 
-
 Build Linux
 -----------
 
-don't forget to set cross-compiler prefix to or32-linux
----
-$ git clone ...
----
+NOTE: You can set the CROSS_COMPILE prefix in the configuration so that you
+don't have to repeatedly specify it on command line.
 
+----
+$ git clone git://openrisc.net/jonas/linux
+----
+
+----
 $ make ARCH=openrisc defconfig
-$ make
-
-
+$ make CROSS_COMPILE=or32-linux
+----
 
 or1ksim
 -------
@@ -215,3 +260,11 @@ The Linux source tree contains a suitable or1ksim config file...
 ----
 $ sim -f arch/openrisc/or1ksim.cfg vmlinux
 ----
+
+Working with --sysroot
+----------------------
+
+The beauty of building the toolchain with '--sysroot' support, as we have
+done above, is that you can easily use an alternate system root...
+
+More instructions about this wonderful feature coming shortly!
