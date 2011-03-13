@@ -1,0 +1,43 @@
+
+
+
+----
+export PREFIX=~/openrisc/toolchain
+export TARGET=or32-linux
+export SYSROOT=$PREFIX/$TARGET/sys-root
+----
+
+
+libelf
+------
+
+perf requires libelf.
+
+Download libelf:
+
+----
+wget http://www.mr511.de/software/libelf-0.8.13.tar.gz
+----
+
+libelf is a bit tricky to build because the 
+configure scripts are slightly borked.  The following incantation will
+do the trick:
+
+
+NOTE: instroot must be an absolute path
+
+----
+CC=or32-linux-gcc ./configure --prefix=/usr --disable-shared
+make
+make instroot=${SYSROOT} install
+----
+
+
+perf
+----
+
+Build perf
+
+----
+make ARCH=openrisc CROSS_COMPILE=or32-linux- NO_DWARF=1 NO_ICONV=1
+----

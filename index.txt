@@ -1,0 +1,47 @@
+OpenRISC
+========
+
+OpenRISC is an Open Source CPU that brings to the world of hardware all the
+same advantages that Open Source software has known for so long.  The OpenRISC
+project is community-driven with most of the action at http://opencores.org/openrisc
+
+These pages primarily target the Linux on OpenRISC use-case and aim to help
+you get up to speed as quickly as possible.  Feedback on these pages and
+questions not answered here can be directed to jonas@southpole.se or vented on
+#opencores at freenode.  We look forward to your becoming a part of the
+larger OpenRISC family!
+
+Documentation
+-------------
+
+link:toolchain-build.html[Building the toolchain]
+
+Source code
+-----------
+
+Source code for the OpenRISC projects targetted by this site can be found
+in our git repository, browseable at http://git.openrisc.net
+
+News
+----
+
+Linux 2.6.38 is almost here.  Here's what's new for OpenRISC Linux in 2.6.38.
+
+* Completely reworked syscall handling.  Unfortunately this breaks ABI, but
+  this needed to be done before making the push for inclusion upstream.  This
+  makes syscalls much more lightweight and allows GCC to generate better code
+  around them.  For certain workloads, this should result in a measureable
+  performance improvement.
++
+NOTE: This is an ABI break and will require an updated uClibc, too.
+
+* Device tree blob (DTB) is now selectable in config file.  This means that
+  you don't have to mess with Makefiles anymore when using a different DTB.
+
+* Added support for kernel modules.
+
+* Indices into ptrace structure made equal to register number, for clarity.
+
+* Offsets into ptrace structure prefixed by PT_ for clarity.
+
+* Lots of bug fixes, header file cleanups, and general improvements.
