@@ -117,7 +117,7 @@ git clone git://openrisc.net/jonas/gcc-svn
 ----
 $ mkdir gcc-build
 $ cd gcc-build
-$ ../gcc-4.5.1/configure --target=or32-linux --prefix=<prefix> \
+$ ../gcc-svn/configure --target=or32-linux --prefix=$PREFIX    \
 --disable-libssp --srcdir=../gcc-svn --enable-languages=c      \
 --without-headers --enable-threads=single --disable-libgomp    \
 --disable-libmudflap
@@ -181,7 +181,7 @@ Now that we have a libC for our target, it's time to build the compiler.  This
 If you want C\+\+, try this instead... important to be explicit about --disable-shared here because libstdc++-v3 isn't clever enough to figure it out for itself.
 
 ----
- $ ../gcc-svn/configure --target=or32-linux --prefix=<prefix>   \
+ $ ../gcc-svn/configure --target=or32-linux --prefix=$PREFIX    \
 --disable-libssp --srcdir=../gcc-svn --enable-languages=c,c++   \
 --enable-threads=posix --disable-libgomp --disable-libmudflap   \
 --disable-shared --with-sysroot=${SYSROOT}
