@@ -16,16 +16,26 @@ Documentation
 
 link:toolchain-build.html[Building the toolchain]
 
-Source code
+Get Involved
 -----------
+
+=== Source code ===
 
 Source code for the OpenRISC projects targetted by this site can be found
 in our git repository, browseable at http://git.openrisc.net
 
+=== Mailing List ===
+
+Discussion about Linux on the OpenRISC architecture happens on our mailing
+list.  More info can be found at http://lists.openrisc.net
+
 News
 ----
 
-Linux 2.6.38 is almost here.  Here's what's new for OpenRISC Linux in 2.6.38.
+Linux 2.6.38 is here.  Get it now from our git repository, tagged
+openrisc-2.6.38, at http://git.openrisc.net/cgit.cgi/jonas/linux.
+
+Here's what's new for OpenRISC Linux in 2.6.38.
 
 * Completely reworked syscall handling.  Unfortunately this breaks ABI, but
   this needed to be done before making the push for inclusion upstream.  This
@@ -45,3 +55,10 @@ NOTE: This is an ABI break and will require an updated uClibc, too.
 * Offsets into ptrace structure prefixed by PT_ for clarity.
 
 * Lots of bug fixes, header file cleanups, and general improvements.
+
+Thanks to all the contributors for this release:
+
+* Jonas Bonn
+* Julius Baxter
+* Giuseppe Scrivano
+* Anders Nyström
