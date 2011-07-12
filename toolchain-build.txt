@@ -162,9 +162,9 @@ this variable into your environment then the default configuration should
 be all you need.
 
 ----
-make ARCH=or32 defconfig
-make PREFIX=${SYSROOT}
-make PREFIX=${SYSROOT} install
+$ make ARCH=or32 defconfig
+$ make PREFIX=${SYSROOT}
+$ make PREFIX=${SYSROOT} install
 ----
 
 
