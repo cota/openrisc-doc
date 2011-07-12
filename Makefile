@@ -1,8 +1,11 @@
 
 DOCS :=	index.html \
 	toolchain-build.html
+PDFDOCS := $(DOCS:.html=.pdf)
 
 all: $(DOCS)
+
+pdf: $(PDFDOCS)
 
 %.html: %.txt
 	asciidoc -o $@ $?
@@ -15,7 +18,7 @@ all: $(DOCS)
 	asciidoc -b docbook $<
 	dblatex --pdf $*.xml
 
-.PHONY: all clean publish
+.PHONY: all clean publish pdf
 clean:
 	rm -f $(DOCS) *.pdf *.xml
 
