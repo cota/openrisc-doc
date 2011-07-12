@@ -162,6 +162,8 @@ this variable into your environment then the default configuration should
 be all you need.
 
 ----
+$ git clone git://openrisc.net/jonas/uClibc
+$ cd uClibc
 $ make ARCH=or32 defconfig
 $ make PREFIX=${SYSROOT}
 $ make PREFIX=${SYSROOT} install
@@ -201,6 +203,7 @@ Now that the final GCC build is complete, uClibc can be built with the final
 compiler.  This is simple a matter of doing a clean rebuild...
 
 ----
+$ cd uClibc
 $ make clean
 $ make PREFIX=${SYSROOT} install
 ----
