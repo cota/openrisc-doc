@@ -15,7 +15,7 @@ all: $(DOCS)
 	asciidoc -b docbook $<
 	dblatex --pdf $*.xml
 
-.PHONY: clean
+.PHONY: all clean publish
 clean:
 	rm -f $(DOCS) *.pdf *.xml
 
