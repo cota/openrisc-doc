@@ -17,7 +17,7 @@ all: $(DOCS)
 
 .PHONY: clean
 clean:
-	rm -f $(DOCS)
+	rm -f $(DOCS) *.pdf *.xml
 
 publish: $(DOCS)
 	scp $^ root@openrisc.net:/var/www/openrisc.net/
