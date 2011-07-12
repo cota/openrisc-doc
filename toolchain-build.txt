@@ -99,6 +99,13 @@ $ make
 $ make install
 ----
 
+[NOTE]
+.Building with recent gcc versions (e.g. 4.6.1)
+=====================================================================
+The build may fail due to warnings being treated as errors. This can
+be disabled by passing the +--enable-werror=no+ flag to the +configure+ script.
+=====================================================================
+
 === Stage 1 GCC ===
 
 Building GCC requires that the binutils utilities that were just built are available in the search path:
